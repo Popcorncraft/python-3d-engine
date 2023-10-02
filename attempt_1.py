@@ -16,6 +16,7 @@ displaySurfaceOffset = [0,0,300]
 
 
 def projector(ax, ay, az):
+    #Don't ask me what math this is
     x = -ax - camPos[0]
     y = -ay - camPos[1]
     z = -az - camPos[2]
@@ -52,9 +53,9 @@ while running:
     screen.fill("gray")
 
     #generate frame
-    pygame.draw.line(screen, "blue", (0, 0, 0), (1, 0, 0))
-    pygame.draw.line(screen, "red", (0, 0, 0), (0, 1, 0))
-    pygame.draw.line(screen, "green", (0, 0, 0), (0, 0, 1))
+    pygame.draw.line(screen, "blue", projector(0, 0, 0), projector(1, 0, 0))
+    pygame.draw.line(screen, "red", projector(0, 0, 0), projector(0, 1, 0))
+    pygame.draw.line(screen, "green", projector(0, 0, 0), projector(0, 0, 1))
 
     #display generated frame
     pygame.display.flip()
