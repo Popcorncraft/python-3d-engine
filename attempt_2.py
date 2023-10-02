@@ -1,3 +1,4 @@
+from sched import Event
 import pygame
 import math
 import numpy as np
@@ -10,22 +11,24 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 
-#3D vector variable type
-class vec3D:
-    def __init__(self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
+matProj = [
+    [],
+    [],
+    [],
+    []
+    ]
 
-#2D vector variable type
-class vec2D:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+def MultMatrixVector(x, y, z):
+    print()
 
-class triangle:
-    def __init__(self, a, b, c):
-        self.a = a
-        self.b = b
-        self.c = c
-
+#main loop
+while running:
+    #test for events
+    for event in pygame.event.get():
+        #quit detection
+        if event.type == pygame.QUIT:
+            running = False
+    
+            
+#close window when quit
+pygame.quit()
