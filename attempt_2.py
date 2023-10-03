@@ -149,12 +149,19 @@ while running == True:
         triProjected[0][1] += 1
         triProjected[1][1] += 1
         triProjected[2][1] += 1
-        triProjected[0][0] *= 0.5 * screen.get_width()
-        triProjected[0][1] *= 0.5 * screen.get_height()
-        triProjected[1][0] *= 0.5 * screen.get_width()
-        triProjected[1][1] *= 0.5 * screen.get_height()
-        triProjected[2][0] *= 0.5 * screen.get_width()
-        triProjected[2][1] *= 0.5 * screen.get_height()
+        #triProjected[0][0] *= 0.5 * screen.get_width()
+        #triProjected[0][1] *= 0.5 * screen.get_height()
+        #triProjected[1][0] *= 0.5 * screen.get_width()
+        #triProjected[1][1] *= 0.5 * screen.get_height()
+        #triProjected[2][0] *= 0.5 * screen.get_width()
+        #triProjected[2][1] *= 0.5 * screen.get_height()
+        triProjected[0][0] = triProjected[0][0] * (0.5 * screen.get_width())
+        triProjected[0][1] = triProjected[0][1] * (0.5 * screen.get_height())
+        triProjected[1][0] = triProjected[1][0] * (0.5 * screen.get_width())
+        triProjected[1][1] = triProjected[1][1] * (0.5 * screen.get_height())
+        triProjected[2][0] = triProjected[2][0] * (0.5 * screen.get_width())
+        triProjected[2][1] = triProjected[2][1] * (0.5 * screen.get_height())
+        
         print(triProjected)
 
         #draw wire-frame
