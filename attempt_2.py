@@ -29,6 +29,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     
+    #variable definitions
+    aspectRatio = screen.get_height/screen.get_width
+    
             
 #close window when quit
 pygame.quit()
