@@ -3,6 +3,16 @@ import pygame
 import math
 import numpy as np
 
+#
+#
+#██████  ███████  █████  ██████       ██   ██ ███████ ██████  ███████ 
+#██   ██ ██      ██   ██ ██   ██      ██   ██ ██      ██   ██ ██      
+#██████  █████   ███████ ██   ██      ███████ █████   ██████  █████   
+#██   ██ ██      ██   ██ ██   ██      ██   ██ ██      ██   ██ ██      
+#██   ██ ███████ ██   ██ ██████       ██   ██ ███████ ██   ██ ███████ 
+#                                                                                
+# I belive that the problem is down near the bottom around line 174. More details down there
+
 #pygame setup
 pygame.init()
 pygame.font.init
@@ -149,20 +159,34 @@ while running == True:
         triProjected[0][1] += 1
         triProjected[1][1] += 1
         triProjected[2][1] += 1
-        #triProjected[0][0] *= 0.5 * screen.get_width()
-        #triProjected[0][1] *= 0.5 * screen.get_height()
-        #triProjected[1][0] *= 0.5 * screen.get_width()
-        #triProjected[1][1] *= 0.5 * screen.get_height()
-        #triProjected[2][0] *= 0.5 * screen.get_width()
-        #triProjected[2][1] *= 0.5 * screen.get_height()
-        triProjected[0][0] = triProjected[0][0] * (0.5 * screen.get_width())
-        triProjected[0][1] = triProjected[0][1] * (0.5 * screen.get_height())
-        triProjected[1][0] = triProjected[1][0] * (0.5 * screen.get_width())
-        triProjected[1][1] = triProjected[1][1] * (0.5 * screen.get_height())
-        triProjected[2][0] = triProjected[2][0] * (0.5 * screen.get_width())
-        triProjected[2][1] = triProjected[2][1] * (0.5 * screen.get_height())
-        
-        print(triProjected)
+
+        print(triProjected[0][0])
+
+        triProjected[0][0] *= 0.5 * screen.get_width()
+        triProjected[0][1] *= 0.5 * screen.get_height()
+        triProjected[1][0] *= 0.5 * screen.get_width()
+        triProjected[1][1] *= 0.5 * screen.get_height()
+        triProjected[2][0] *= 0.5 * screen.get_width()
+        triProjected[2][1] *= 0.5 * screen.get_height()
+
+        print(triProjected[0][0])
+
+        # ↑ These ↓ do the same thing. I have prints to test values. Before it gets fully scaled it is at ~3. After, it is ~80,000,000.
+        #                              It is semi-random due to some time based rotations I have going on but those shouldn't affect it. 
+        #                              But if it does the thing is on line 104. I have tried replacing screen.get_width() and screen.get_height()
+        #                              with the actual values but it didn't seem to change anything.
+        #
+        #                              The entire project is really just me trying to create a python version of Javidx9(One Lone Coder)'s cpp 3d engine.
+        #                              https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Engine3D/OneLoneCoder_olcEngine3D_Part1.cpp
+        #                              https://youtu.be/ih20l3pJoeU?list=PLrOv9FMX8xJE8NgepZR1etrsU63fDDGxO&t=2283
+
+
+        #triProjected[0][0] = triProjected[0][0] * (0.5 * screen.get_width())
+        #triProjected[0][1] = triProjected[0][1] * (0.5 * screen.get_height())
+        #triProjected[1][0] = triProjected[1][0] * (0.5 * screen.get_width())
+        #triProjected[1][1] = triProjected[1][1] * (0.5 * screen.get_height())
+        #triProjected[2][0] = triProjected[2][0] * (0.5 * screen.get_width())
+        #triProjected[2][1] = triProjected[2][1] * (0.5 * screen.get_height())
 
         #draw wire-frame
         DrawWireTriangle(
