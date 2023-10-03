@@ -1,6 +1,8 @@
 import math
 import pygame
 
+pygame.init()
+
 #init variables
 fov = 90
 viewNear = 0.1
