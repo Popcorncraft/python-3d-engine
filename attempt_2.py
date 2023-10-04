@@ -199,8 +199,6 @@ while running == True:
             triProjected[2][0],
             triProjected[2][1],
         )
-        
-        pygame.quit()
 
     #limit framerate
     clock.tick(60)
