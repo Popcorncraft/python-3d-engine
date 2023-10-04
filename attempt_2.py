@@ -178,7 +178,7 @@ while running == True:
         #
         #                              The entire project is really just me trying to create a python version of Javidx9(One Lone Coder)'s cpp 3d engine.
         #                              https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Engine3D/OneLoneCoder_olcEngine3D_Part1.cpp
-        #                              https://youtu.be/ih20l3pJoeU?list=PLrOv9FMX8xJE8NgepZR1etrsU63fDDGxO&t=2283
+        #                              https://youtu.be/ih20l3pJoeU?list=PLrOv9FMX8xJE8NgepZR1etrsU63fDDGxO&t=2283 Intended output
 
 
         #triProjected[0][0] = triProjected[0][0] * (0.5 * screen.get_width())
