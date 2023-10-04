@@ -17,6 +17,15 @@ triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 test = 1
 
+#██████  ███████  █████  ██████       ██   ██ ███████ ██████  ███████ 
+#██   ██ ██      ██   ██ ██   ██      ██   ██ ██      ██   ██ ██      
+#██████  █████   ███████ ██   ██      ███████ █████   ██████  █████   
+#██   ██ ██      ██   ██ ██   ██      ██   ██ ██      ██   ██ ██      
+#██   ██ ███████ ██   ██ ██████       ██   ██ ███████ ██   ██ ███████ 
+#
+#This is not my actual project file. This just has all the stuff necescary for the part that is acting up to work.
+# The problem is down a the bottom of this page with more details down there.
+
 meshCube = [
     #south
     [[0, 0, 0],[0, 1, 0],[1, 1, 0]],
@@ -94,44 +103,49 @@ matRotX[2][1] = -math.sin(theta * 0.5)
 matRotX[2][2] = math.cos(theta * 0.5)
 matRotX[3][3] = 1
 
-for tri in meshCube:
+#for tri in meshCube:
 
-    #rotate z-axis
-    triRotatedZ[0] = MultiplyMatrixVector(tri[0], matRotZ)
-    triRotatedZ[1] = MultiplyMatrixVector(tri[1], matRotZ)
-    triRotatedZ[2] = MultiplyMatrixVector(tri[2], matRotZ)
+#hotfix to get rid of loop
+tri = [[0, 0, 0],[0, 1, 0],[1, 1, 0]]
 
-    #rotate x-axis
-    triRotatedZX[0] = MultiplyMatrixVector(triRotatedZ[0], matRotX)
-    triRotatedZX[1] = MultiplyMatrixVector(triRotatedZ[1], matRotX)
-    triRotatedZX[2] = MultiplyMatrixVector(triRotatedZ[2], matRotX)
+#rotate z-axis
+triRotatedZ[0] = MultiplyMatrixVector(tri[0], matRotZ)
+triRotatedZ[1] = MultiplyMatrixVector(tri[1], matRotZ)
+triRotatedZ[2] = MultiplyMatrixVector(tri[2], matRotZ)
 
-    #offset into screen
-    triTranslated = triRotatedZX
-    triTranslated[0][2] = triRotatedZX[0][2] + 3
-    triTranslated[1][2] = triRotatedZX[1][2] + 3
-    triTranslated[2][2] = triRotatedZX[2][2] + 3
+#rotate x-axis
+triRotatedZX[0] = MultiplyMatrixVector(triRotatedZ[0], matRotX)
+triRotatedZX[1] = MultiplyMatrixVector(triRotatedZ[1], matRotX)
+triRotatedZX[2] = MultiplyMatrixVector(triRotatedZ[2], matRotX)
 
-    #project onto screen
-    triProjected[0] = MultiplyMatrixVector(triTranslated[0], matProj)
-    triProjected[1] = MultiplyMatrixVector(triTranslated[1], matProj)
-    triProjected[2] = MultiplyMatrixVector(triTranslated[2], matProj)
+#offset into screen
+triTranslated = triRotatedZX
+triTranslated[0][2] = triRotatedZX[0][2] + 10
+triTranslated[1][2] = triRotatedZX[1][2] + 10
+triTranslated[2][2] = triRotatedZX[2][2] + 10
 
-    #scale into view
-    triProjected[0][0] += 1
-    triProjected[1][0] += 1
-    triProjected[2][0] += 1
-    triProjected[0][1] += 1
-    triProjected[1][1] += 1
-    triProjected[2][1] += 1
+#project onto screen
+triProjected[0] = MultiplyMatrixVector(triTranslated[0], matProj)
+triProjected[1] = MultiplyMatrixVector(triTranslated[1], matProj)
+triProjected[2] = MultiplyMatrixVector(triTranslated[2], matProj)
 
-    print(triProjected[0][0])
+#scale into view
+triProjected[0][0] += 1
+triProjected[1][0] += 1
+triProjected[2][0] += 1
+triProjected[0][1] += 1
+triProjected[1][1] += 1
+triProjected[2][1] += 1
 
-    triProjected[0][0] *= 0.5 * 1280
-    triProjected[0][1] *= 0.5 * 720
-    triProjected[1][0] *= 0.5 * 1280
-    triProjected[1][1] *= 0.5 * 720
-    triProjected[2][0] *= 0.5 * 1280
-    triProjected[2][1] *= 0.5 * 720
+#This will return a value of ~3 as it should          <<<<<<<
+print(triProjected[0][0])
 
-    print(triProjected[0][0])
+triProjected[0][0] *= 0.5 * 1280
+triProjected[0][1] *= 0.5 * 720
+triProjected[1][0] *= 0.5 * 1280
+triProjected[1][1] *= 0.5 * 720
+triProjected[2][0] *= 0.5 * 1280
+triProjected[2][1] *= 0.5 * 720
+
+#This should return a x and y value on the screen but is instead returning a value ~79,000,000      <<<<<<
+print(triProjected[0][0])

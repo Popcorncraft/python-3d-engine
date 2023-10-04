@@ -172,13 +172,15 @@ while running == True:
         print(triProjected[0][0])
 
         # ↑ These ↓ do the same thing. I have prints to test values. Before it gets fully scaled it is at ~3. After, it is ~80,000,000.
-        #                              It is semi-random due to some time based rotations I have going on but those shouldn't affect it. 
-        #                              But if it does the thing is on line 104. I have tried replacing screen.get_width() and screen.get_height()
-        #                              with the actual values but it didn't seem to change anything.
-        #
-        #                              The entire project is really just me trying to create a python version of Javidx9(One Lone Coder)'s cpp 3d engine.
-        #                              https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Engine3D/OneLoneCoder_olcEngine3D_Part1.cpp
-        #                              https://youtu.be/ih20l3pJoeU?list=PLrOv9FMX8xJE8NgepZR1etrsU63fDDGxO&t=2283 Intended output
+        #         ↓                    It is semi-random due to some time based rotations I have going on but those shouldn't affect it. 
+        #         ↓                    But if it does the thing is on line 104. I have tried replacing screen.get_width() and screen.get_height()
+        #         ↓                    with the actual values but it didn't seem to change anything.
+        #         ↓
+        #         ↓                    The entire project is really just me trying to create a python version of Javidx9(One Lone Coder)'s cpp 3d engine.
+        #         ↓                    https://github.com/OneLoneCoder/Javidx9/blob/master/ConsoleGameEngine/BiggerProjects/Engine3D/OneLoneCoder_olcEngine3D_Part1.cpp
+        #         ↓                    https://youtu.be/ih20l3pJoeU?list=PLrOv9FMX8xJE8NgepZR1etrsU63fDDGxO&t=2283 Intended output
+        #                               
+        #                              
 
 
         #triProjected[0][0] = triProjected[0][0] * (0.5 * screen.get_width())
