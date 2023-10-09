@@ -24,7 +24,7 @@ triRotatedZ = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 triRotatedZX = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-test = 1
+lastFrameTicks = 1
 
 meshCube = [
     #south
@@ -72,11 +72,13 @@ while running == True:
     #clear screen
     screen.fill("black")
 
-    pygame.draw.polygon(screen, "white", [(0, 0), (0, 10), (10, 10)])
+    #define theta
+    t = pygame.time.get_ticks()
+    deltaTime = (t - lastFrameTicks) / 1000
+    theta += 1 * deltaTime
+    lastFrameTicks = t
 
     #set up rotation matricies
-    theta += 1 * pygame.time.get_ticks()
-
     matRotZ = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -142,9 +144,12 @@ while running == True:
         triProjected[2][1] *= 0.5 * screen.get_height()
 
         #draw wire-frame
-        #pygame.draw.line(screen, "white", (triProjected[0][0], triProjected[0][1]), (triProjected[1][0], triProjected[1][1]))
-        #pygame.draw.line(screen, "white", (triProjected[1][0], triProjected[1][1]), (triProjected[2][0], triProjected[2][1]))
-        #pygame.draw.line(screen, "white", (triProjected[2][0], triProjected[2][1]), (triProjected[0][0], triProjected[0][1]))
+        pygame.draw.line(screen, "white", (triProjected[0][0], triProjected[0][1]), (triProjected[1][0], triProjected[1][1]))
+        pygame.draw.line(screen, "white", (triProjected[1][0], triProjected[1][1]), (triProjected[2][0], triProjected[2][1]))
+        pygame.draw.line(screen, "white", (triProjected[2][0], triProjected[2][1]), (triProjected[0][0], triProjected[0][1]))
+
+    #update entire display
+    pygame.display.flip()
 
     #limit framerate
     clock.tick(60)
