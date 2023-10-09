@@ -72,6 +72,8 @@ while running == True:
     #clear screen
     screen.fill("black")
 
+    pygame.draw.polygon(screen, "white", [(0, 0), (0, 10), (10, 10)])
+
     #set up rotation matricies
     theta += 1 * pygame.time.get_ticks()
 
