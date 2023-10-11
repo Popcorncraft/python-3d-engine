@@ -8,7 +8,7 @@ from functions import *
 pygame.init()
 pygame.font.init
 pygame.display.set_caption('3d Renderer')
-screen = pygame.display.set_mode()
+screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
 
@@ -68,7 +68,12 @@ while running == True:
         #quit detection
         if event.type == pygame.QUIT:
             running = False
-    
+
+        # Toggle Fullscreen with F11
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_F11:
+                pygame.display.toggle_fullscreen()
+
     #clear screen
     screen.fill("black")
 
