@@ -1,8 +1,11 @@
+#import libraries
 from sched import Event
 import pygame
 import math
-import numpy as np
+
+#import files
 from functions import *
+from debugAssets import *
 
 #pygame setup
 pygame.init()
@@ -17,7 +20,7 @@ fov = 90
 viewNear = 0.1
 viewFar = 1000
 fovRad = 1 / math.tan(fov * 0.5 / 180 * math.pi)
-aspectRatio = aspectRatio = screen.get_height() / screen.get_width()
+aspectRatio = screen.get_height() / screen.get_width()
 theta = 0
 output = [0, 0, 0]
 triRotatedZ = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -26,28 +29,7 @@ triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 lastFrameTicks = 1
 
-meshCube = [
-    #south
-    [[0, 0, 0],[0, 1, 0],[1, 1, 0]],
-    [[0, 0, 0],[1, 1, 0],[1, 0, 0]],
-    #east
-    [[1, 0, 0],[1, 1, 0],[1, 1, 1]],
-    [[1, 0, 0],[1, 1, 1],[1, 0, 1]],
-    #north
-    [[1, 0, 1],[1, 1, 1],[0, 1, 1]],
-    [[1, 0, 1],[0, 1, 1],[0, 0, 1]],
-    #west
-    [[0, 0, 1],[0, 1, 1],[0, 1, 0]],
-    [[0, 0, 1],[0, 1, 0],[0, 0, 0]],
-    #top
-    [[0, 1, 0],[0, 1, 1],[1, 1, 1]],
-    [[0, 1, 0],[1, 1, 1],[1, 1, 0]],
-    #bottom
-    [[1, 0, 1],[0, 0, 1],[0, 0, 0]],
-    [[1, 0, 1],[0, 0, 0],[1, 0, 0]],
-    ]
-
-#init projection matrix
+#init main projection matrix
 matProj = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -68,14 +50,18 @@ while running == True:
         #quit detection
         if event.type == pygame.QUIT:
             running = False
+            pygame.quit()
 
         # Toggle Fullscreen with F11
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
-
     #clear screen
     screen.fill("black")
+
+    #update relavent variables
+    fovRad = 1 / math.tan(fov * 0.5 / 180 * math.pi)
+    aspectRatio = screen.get_height() / screen.get_width()
 
     #define theta
     t = pygame.time.get_ticks()
