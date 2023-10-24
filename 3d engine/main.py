@@ -25,9 +25,11 @@ aspectRatio = screen.get_height() / screen.get_width()
 theta = 0
 lastFrameTicks = 1
 normal = [0, 0, 0]
-cameraPos = [0, 0, 1]
+cameraPos = [0, 0, 0]
 cameraRot = [0, 0, 0]
-testNormal = [0, 0, 0]
+normalizedNormal = [0, 0, 0]
+screenCoords = [[0, 0],[0, 0],[0, 0]]
+lightingDirection = [0, -1, -1]
 
 #main loop
 while running == True:
@@ -115,16 +117,19 @@ while running == True:
         triTranslated[1][2] = triRotatedZX[1][2] + 3
         triTranslated[2][2] = triRotatedZX[2][2] + 3
 
-        #calculate triangle normals
-        normal = [0, 0, 0]
-        normal = normalizeVector(calculateNormal(triTranslated))
+        #get normal
+        normal = calculateNormal(triTranslated)
+        normalizedNormal = normalizeVector(normal)
 
-        #calculate differce between triangle and camera
-        testNormal[0] = triTranslated[0][0] - cameraPos[0]
-        testNormal[1] = triTranslated[0][1] - cameraPos[1]
-        testNormal[2] = triTranslated[0][2] - cameraPos[2]
+        if (
+            normalizedNormal[0] * (triTranslated[0][0]) + 
+            normalizedNormal[1] * (triTranslated[0][1]) + 
+            normalizedNormal[2] * (triTranslated[0][2])
+            ) < 0:
 
-        if dotProduct(normal, testNormal) < 0:
+            #one direction light
+            lightingDirection = normalizeVector(lightingDirection)
+            shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
 
             #project onto screen
             triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -147,10 +152,19 @@ while running == True:
             triProjected[2][0] *= 0.5 * screen.get_width()
             triProjected[2][1] *= 0.5 * screen.get_height()
 
+            #convert to 2d points
+            screenCoords[0][0] = triProjected[0][0]
+            screenCoords[0][1] = triProjected[0][1]
+            screenCoords[1][0] = triProjected[1][0]
+            screenCoords[1][1] = triProjected[1][1]
+            screenCoords[2][0] = triProjected[2][0]
+            screenCoords[2][1] = triProjected[2][1]
+
             #draw wire-frame
-            pygame.draw.line(screen, "white", (triProjected[0][0], triProjected[0][1]), (triProjected[1][0], triProjected[1][1]))
-            pygame.draw.line(screen, "white", (triProjected[1][0], triProjected[1][1]), (triProjected[2][0], triProjected[2][1]))
-            pygame.draw.line(screen, "white", (triProjected[2][0], triProjected[2][1]), (triProjected[0][0], triProjected[0][1]))
+            pygame.draw.polygon(screen, (shading, shading, shading), (screenCoords[0], screenCoords[1], screenCoords[2]))
+            #pygame.draw.line(screen, "white", screenCoords[0], screenCoords[1])
+            #pygame.draw.line(screen, "white", screenCoords[1], screenCoords[2])
+            #pygame.draw.line(screen, "white", screenCoords[2], screenCoords[0])
 
     #update entire display
     pygame.display.flip()
