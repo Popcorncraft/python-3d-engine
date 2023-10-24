@@ -6,30 +6,20 @@ import math
 #import files
 from functions import *
 from debugAssets import *
+from settings import *
 
 #pygame setup
 pygame.init()
 pygame.font.init
 pygame.display.set_caption('3d Renderer')
-screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+screen = pygame.display.set_mode((screenWidth, screenHeight), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
-selectedModel = meshCube
 
 #init variables
-fov = 90
-viewNear = 0.1
-viewFar = 1000
-fovRad = 1 / math.tan(fov * 0.5 / 180 * math.pi)
-aspectRatio = screen.get_height() / screen.get_width()
 theta = 0
 lastFrameTicks = 1
-normal = [0, 0, 0]
-cameraPos = [0, 0, 0]
-cameraRot = [0, 0, 0]
-normalizedNormal = [0, 0, 0]
-screenCoords = [[0, 0],[0, 0],[0, 0]]
-lightingDirection = [0, -1, -1]
+selectedModel = createMeshFromOBJ("3d engine/assets/teapot.obj")
 
 #main loop
 while running == True:
@@ -97,6 +87,8 @@ while running == True:
     matRotX[2][2] = math.cos(theta * 0.5)
     matRotX[3][3] = 1
 
+    projectedMesh = []
+
     for tri in selectedModel:
         #rotate z-axis
         triRotatedZ = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
@@ -113,29 +105,37 @@ while running == True:
         #offset into screen
         triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         triTranslated = triRotatedZX
-        triTranslated[0][2] = triRotatedZX[0][2] + 3
-        triTranslated[1][2] = triRotatedZX[1][2] + 3
-        triTranslated[2][2] = triRotatedZX[2][2] + 3
+        triTranslated[0][2] = triRotatedZX[0][2] + 10
+        triTranslated[1][2] = triRotatedZX[1][2] + 10
+        triTranslated[2][2] = triRotatedZX[2][2] + 10
+        
+        #add triangles to mesh
+        projectedMesh.append(triTranslated)
+    
+    #sort triangles in mesh by z depth
+    projectedMesh.sort(reverse=True, key=sortByAverageZ)
 
+    for tri in projectedMesh:
         #get normal
-        normal = calculateNormal(triTranslated)
+        normal = [0, 0, 0]
+        normalizedNormal = [0, 0, 0]
+        normal = calculateNormal(tri)
         normalizedNormal = normalizeVector(normal)
 
         if (
-            normalizedNormal[0] * (triTranslated[0][0]) + 
-            normalizedNormal[1] * (triTranslated[0][1]) + 
-            normalizedNormal[2] * (triTranslated[0][2])
+            normalizedNormal[0] * (tri[0][0]) + 
+            normalizedNormal[1] * (tri[0][1]) + 
+            normalizedNormal[2] * (tri[0][2])
             ) < 0:
-
             #one direction light
             lightingDirection = normalizeVector(lightingDirection)
             shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
 
             #project onto screen
             triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-            triProjected[0] = MultiplyMatrixVector(triTranslated[0], matProj)
-            triProjected[1] = MultiplyMatrixVector(triTranslated[1], matProj)
-            triProjected[2] = MultiplyMatrixVector(triTranslated[2], matProj)
+            triProjected[0] = MultiplyMatrixVector(tri[0], matProj)
+            triProjected[1] = MultiplyMatrixVector(tri[1], matProj)
+            triProjected[2] = MultiplyMatrixVector(tri[2], matProj)
 
             #scale into view
             triProjected[0][0] += 1
@@ -153,6 +153,7 @@ while running == True:
             triProjected[2][1] *= 0.5 * screen.get_height()
 
             #convert to 2d points
+            screenCoords = [[0, 0],[0, 0],[0, 0]]
             screenCoords[0][0] = triProjected[0][0]
             screenCoords[0][1] = triProjected[0][1]
             screenCoords[1][0] = triProjected[1][0]
