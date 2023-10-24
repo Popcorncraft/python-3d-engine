@@ -14,6 +14,7 @@ pygame.display.set_caption('3d Renderer')
 screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 clock = pygame.time.Clock()
 running = True
+selectedModel = meshCube
 
 #init variables
 fov = 90
@@ -22,26 +23,11 @@ viewFar = 1000
 fovRad = 1 / math.tan(fov * 0.5 / 180 * math.pi)
 aspectRatio = screen.get_height() / screen.get_width()
 theta = 0
-output = [0, 0, 0]
-triRotatedZ = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-triRotatedZX = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 lastFrameTicks = 1
-
-#init main projection matrix
-matProj = [
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0]
-    ]
-matProj[0][0] = aspectRatio * fovRad
-matProj[1][1] = fovRad
-matProj[2][2] = viewFar / (viewFar - viewNear)
-matProj[3][2] = (-viewFar * viewNear) / (viewFar - viewNear)
-matProj[2][3] = 1.0
-matProj[3][3] = 0.0
+normal = [0, 0, 0]
+cameraPos = [0, 0, 1]
+cameraRot = [0, 0, 0]
+testNormal = [0, 0, 0]
 
 #main loop
 while running == True:
@@ -69,7 +55,20 @@ while running == True:
     theta += 1 * deltaTime
     lastFrameTicks = t
 
-    #set up rotation matricies
+    #set up and update matricies
+    matProj = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
+    ]
+    matProj[0][0] = aspectRatio * fovRad
+    matProj[1][1] = fovRad
+    matProj[2][2] = viewFar / (viewFar - viewNear)
+    matProj[3][2] = (-viewFar * viewNear) / (viewFar - viewNear)
+    matProj[2][3] = 1.0
+    matProj[3][3] = 0.0
+
     matRotZ = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -96,48 +95,62 @@ while running == True:
     matRotX[2][2] = math.cos(theta * 0.5)
     matRotX[3][3] = 1
 
-    for tri in meshCube:
-
+    for tri in selectedModel:
         #rotate z-axis
+        triRotatedZ = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         triRotatedZ[0] = MultiplyMatrixVector(tri[0], matRotZ)
         triRotatedZ[1] = MultiplyMatrixVector(tri[1], matRotZ)
         triRotatedZ[2] = MultiplyMatrixVector(tri[2], matRotZ)
 
         #rotate x-axis
+        triRotatedZX = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         triRotatedZX[0] = MultiplyMatrixVector(triRotatedZ[0], matRotX)
         triRotatedZX[1] = MultiplyMatrixVector(triRotatedZ[1], matRotX)
         triRotatedZX[2] = MultiplyMatrixVector(triRotatedZ[2], matRotX)
 
         #offset into screen
+        triTranslated = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
         triTranslated = triRotatedZX
         triTranslated[0][2] = triRotatedZX[0][2] + 3
         triTranslated[1][2] = triRotatedZX[1][2] + 3
         triTranslated[2][2] = triRotatedZX[2][2] + 3
 
-        #project onto screen
-        triProjected[0] = MultiplyMatrixVector(triTranslated[0], matProj)
-        triProjected[1] = MultiplyMatrixVector(triTranslated[1], matProj)
-        triProjected[2] = MultiplyMatrixVector(triTranslated[2], matProj)
+        #calculate triangle normals
+        normal = [0, 0, 0]
+        normal = normalizeVector(calculateNormal(triTranslated))
 
-        #scale into view
-        triProjected[0][0] += 1
-        triProjected[1][0] += 1
-        triProjected[2][0] += 1
-        triProjected[0][1] += 1
-        triProjected[1][1] += 1
-        triProjected[2][1] += 1
+        #calculate differce between triangle and camera
+        testNormal[0] = triTranslated[0][0] - cameraPos[0]
+        testNormal[1] = triTranslated[0][1] - cameraPos[1]
+        testNormal[2] = triTranslated[0][2] - cameraPos[2]
 
-        triProjected[0][0] *= 0.5 * screen.get_width()
-        triProjected[0][1] *= 0.5 * screen.get_height()
-        triProjected[1][0] *= 0.5 * screen.get_width()
-        triProjected[1][1] *= 0.5 * screen.get_height()
-        triProjected[2][0] *= 0.5 * screen.get_width()
-        triProjected[2][1] *= 0.5 * screen.get_height()
+        if dotProduct(normal, testNormal) < 0:
 
-        #draw wire-frame
-        pygame.draw.line(screen, "white", (triProjected[0][0], triProjected[0][1]), (triProjected[1][0], triProjected[1][1]))
-        pygame.draw.line(screen, "white", (triProjected[1][0], triProjected[1][1]), (triProjected[2][0], triProjected[2][1]))
-        pygame.draw.line(screen, "white", (triProjected[2][0], triProjected[2][1]), (triProjected[0][0], triProjected[0][1]))
+            #project onto screen
+            triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            triProjected[0] = MultiplyMatrixVector(triTranslated[0], matProj)
+            triProjected[1] = MultiplyMatrixVector(triTranslated[1], matProj)
+            triProjected[2] = MultiplyMatrixVector(triTranslated[2], matProj)
+
+            #scale into view
+            triProjected[0][0] += 1
+            triProjected[1][0] += 1
+            triProjected[2][0] += 1
+            triProjected[0][1] += 1
+            triProjected[1][1] += 1
+            triProjected[2][1] += 1
+
+            triProjected[0][0] *= 0.5 * screen.get_width()
+            triProjected[0][1] *= 0.5 * screen.get_height()
+            triProjected[1][0] *= 0.5 * screen.get_width()
+            triProjected[1][1] *= 0.5 * screen.get_height()
+            triProjected[2][0] *= 0.5 * screen.get_width()
+            triProjected[2][1] *= 0.5 * screen.get_height()
+
+            #draw wire-frame
+            pygame.draw.line(screen, "white", (triProjected[0][0], triProjected[0][1]), (triProjected[1][0], triProjected[1][1]))
+            pygame.draw.line(screen, "white", (triProjected[1][0], triProjected[1][1]), (triProjected[2][0], triProjected[2][1]))
+            pygame.draw.line(screen, "white", (triProjected[2][0], triProjected[2][1]), (triProjected[0][0], triProjected[0][1]))
 
     #update entire display
     pygame.display.flip()
