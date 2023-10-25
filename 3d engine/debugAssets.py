@@ -21,3 +21,4 @@ meshCube = [
     ]
 
 # 3d engine/assets/teapot.obj
+# 3d engine/assets/ship.obj
