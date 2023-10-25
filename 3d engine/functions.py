@@ -4,18 +4,18 @@ from vectorFunctions import *
 
 def calculateNormal(input):
     
-    output = vector()
-    line1 = vector()
-    line2 = vector()
+    output = [0, 0, 0, 1]
+    line1 = [0, 0, 0, 1]
+    line2 = [0, 0, 0, 1]
 
     #calculate lines
-    line1.x = input[1].x - input[0].x
-    line1.y = input[1].y - input[0].y
-    line1.z = input[1].z - input[0].z
+    line1[0] = input[1][0] - input[0][0]
+    line1[1] = input[1][1] - input[0][1]
+    line1[2] = input[1][2] - input[0][2]
     
-    line2.x = input[2].x - input[0].x
-    line2.y = input[2].y - input[0].y
-    line2.z = input[2].z - input[0].z
+    line2[0] = input[2][0] - input[0][0]
+    line2[1] = input[2][1] - input[0][1]
+    line2[2] = input[2][2] - input[0][2]
 
     #cross product
     output = crossProduct(line1, line2)
@@ -24,15 +24,15 @@ def calculateNormal(input):
 
 def createMeshFromOBJ(path):
     file = open(path)
-    vectors = [vector()]
+    vectors = [[0, 0, 0, 1]]
     mesh = []
     for line in file:
         if line[0] == "v":
             tempLine = line.split()
-            tempVector = vector()
-            tempVector.x = float(tempLine[1])
-            tempVector.y = float(tempLine[2])
-            tempVector.z = float(tempLine[3])
+            tempVector = [0, 0, 0, 1]
+            tempVector[0] = float(tempLine[1])
+            tempVector[1] = float(tempLine[2])
+            tempVector[2] = float(tempLine[3])
             vectors.append(tempVector)
         elif line[0] == "f":
             tempLine = line.split()
@@ -44,6 +44,6 @@ def createMeshFromOBJ(path):
     return(mesh)
 
 def sortByAverageZ(tri):
-    sum = tri[0].z + tri[1].z + tri[2].z
+    sum = tri[0][2] + tri[1][2] + tri[2][2]
     average = sum / 3
     return(average)

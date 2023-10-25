@@ -16,9 +16,9 @@ viewNear = 0.1
 viewFar = 1000
 screenWidth = 1280
 screenHeight = 720
-cameraPos = vector()
-cameraRot = vector()
-lightingDirection = vector(0, -0.5, -1)
+cameraPos = [0, 0, 0, 1]
+cameraRot = [0, 0, 0, 1]
+lightingDirection = [0, 0, -1, 1]
 
 #pygame setup
 pygame.init()
@@ -69,26 +69,22 @@ while running == True:
     matWorld = matrixMultiplyMatrix(matRotX, matRotZ)
     matWorld = matrixMultiplyMatrix(matWorld, matTrans)
 
-    projectedMesh = []
-
     for tri in selectedModel:
-        triTransformed = [vector(), vector(), vector()]
+        triTransformed = [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]
         triTransformed[0] = matrixMultiplyVector(matWorld, tri[0])
         triTransformed[1] = matrixMultiplyVector(matWorld, tri[1])
         triTransformed[2] = matrixMultiplyVector(matWorld, tri[2])
-        #add triangles to mesh
-        projectedMesh.append(triTransformed)
 
         #get normal
-        normal = vector()
-        normalizedNormal = vector()
+        normal = [0, 0, 0, 1]
+        normalizedNormal = [0, 0, 0, 1]
         normal = calculateNormal(tri)
-        normalizedNormal = vector(normalizeVector(normal))
+        normalizedNormal = normalizeVector(normal)
 
         #camera ray
-        cameraRay = vector(subVec(triTransformed[0], cameraPos))
+        cameraRay = subVec(triTransformed[0], cameraPos)
 
-        if (dotProduct(normalizedNormal, cameraRay)) < 0:
+        if (dotProduct(normalizedNormal, cameraRay)) > 0:
             #one direction light
             lightingDirection = normalizeVector(lightingDirection)
             shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
@@ -99,31 +95,31 @@ while running == True:
             triProjected[1] = matrixMultiplyVector(matProj, triTransformed[1])
             triProjected[2] = matrixMultiplyVector(matProj, triTransformed[2])
 
-            triProjected[0] = divVec(triProjected[0], triProjected[0].w)
-            triProjected[1] = divVec(triProjected[1], triProjected[1].w)
-            triProjected[2] = divVec(triProjected[2], triProjected[2].w)
+            triProjected[0] = divVec(triProjected[0], triProjected[0][3])
+            triProjected[1] = divVec(triProjected[1], triProjected[1][3])
+            triProjected[2] = divVec(triProjected[2], triProjected[2][3])
 
             #scale into view
-            offsetView = vector(1, 1, 0)
+            offsetView = [1, 1, 0, 1]
             triProjected[0] = addVec(triProjected[0], offsetView)
             triProjected[1] = addVec(triProjected[1], offsetView)
             triProjected[2] = addVec(triProjected[2], offsetView)
 
-            triProjected[0].x *= 0.5 * screen.get_width()
-            triProjected[0].y *= 0.5 * screen.get_height()
-            triProjected[1].x *= 0.5 * screen.get_width()
-            triProjected[1].y *= 0.5 * screen.get_height()
-            triProjected[2].x *= 0.5 * screen.get_width()
-            triProjected[2].y *= 0.5 * screen.get_height()
+            triProjected[0][0] *= 0.5 * screen.get_width()
+            triProjected[0][1] *= 0.5 * screen.get_height()
+            triProjected[1][0] *= 0.5 * screen.get_width()
+            triProjected[1][1] *= 0.5 * screen.get_height()
+            triProjected[2][0] *= 0.5 * screen.get_width()
+            triProjected[2][1] *= 0.5 * screen.get_height()
 
             #convert to 2d points
             screenCoords = [[0, 0],[0, 0],[0, 0]]
-            screenCoords[0][0] = triProjected[0].x
-            screenCoords[0][1] = triProjected[0].y
-            screenCoords[1][0] = triProjected[1].x
-            screenCoords[1][1] = triProjected[1].y
-            screenCoords[2][0] = triProjected[2].x
-            screenCoords[2][1] = triProjected[2].y
+            screenCoords[0][0] = triProjected[0][0]
+            screenCoords[0][1] = triProjected[0][1]
+            screenCoords[1][0] = triProjected[1][0]
+            screenCoords[1][1] = triProjected[1][1]
+            screenCoords[2][0] = triProjected[2][0]
+            screenCoords[2][1] = triProjected[2][1]
 
             #draw wire-frame
             pygame.draw.polygon(screen, (shading, shading, shading), (screenCoords[0], screenCoords[1], screenCoords[2]))
