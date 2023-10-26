@@ -32,6 +32,7 @@ running = True
 theta = 0
 lastFrameTicks = 1
 selectedModel = createMeshFromOBJ("3d engine/assets/teapot.obj")
+mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], [0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]]]
 
 #main loop
 while running == True:
@@ -81,16 +82,16 @@ while running == True:
         normal = calculateNormal(tri)
         normalizedNormal = normalizeVector(normal)
 
+        #one direction light
+        lightingDirection = normalizeVector(lightingDirection)
+        shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
+
         #camera ray
         cameraRay = subVec(triTransformed[0], cameraPos)
 
         if (dotProduct(normalizedNormal, cameraRay)) > 0:
-            #one direction light
-            lightingDirection = normalizeVector(lightingDirection)
-            shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
-
             #project onto screen
-            triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0]]
             triProjected[0] = matrixMultiplyVector(matProj, triTransformed[0])
             triProjected[1] = matrixMultiplyVector(matProj, triTransformed[1])
             triProjected[2] = matrixMultiplyVector(matProj, triTransformed[2])
@@ -111,21 +112,14 @@ while running == True:
             triProjected[1][1] *= 0.5 * screen.get_height()
             triProjected[2][0] *= 0.5 * screen.get_width()
             triProjected[2][1] *= 0.5 * screen.get_height()
+            triProjected[3] = shading
 
-            #convert to 2d points
-            screenCoords = [[0, 0],[0, 0],[0, 0]]
-            screenCoords[0][0] = triProjected[0][0]
-            screenCoords[0][1] = triProjected[0][1]
-            screenCoords[1][0] = triProjected[1][0]
-            screenCoords[1][1] = triProjected[1][1]
-            screenCoords[2][0] = triProjected[2][0]
-            screenCoords[2][1] = triProjected[2][1]
+            mesh.append(triProjected)
 
-            #draw wire-frame
-            pygame.draw.polygon(screen, (shading, shading, shading), (screenCoords[0], screenCoords[1], screenCoords[2]))
-            #pygame.draw.line(screen, "white", screenCoords[0], screenCoords[1])
-            #pygame.draw.line(screen, "white", screenCoords[1], screenCoords[2])
-            #pygame.draw.line(screen, "white", screenCoords[2], screenCoords[0])
+    sortedMesh = mesh.sort(key=sortByAverageZ)
+
+    for tri in sortedMesh:
+        pygame.draw.polygon(screen, (tri[3], tri[3], tri[3]), ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
 
     #update entire display
     pygame.display.flip()
