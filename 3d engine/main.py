@@ -116,7 +116,7 @@ while running == True:
 
             mesh.append(triProjected)
 
-    mesh = mesh.sort(key=sortByAverageZ)
+    mesh.sort(key=sortByAverageZ)
 
     for tri in mesh:
         pygame.draw.polygon(screen, (tri[3], tri[3], tri[3]), ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
