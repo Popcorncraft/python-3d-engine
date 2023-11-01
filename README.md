@@ -1,4 +1,4 @@
-# python-3d-renderer
+# python-3d-engine
 A 3d renderer using python and pygame.
 
 This project is a version of javidx9's 3d engine but written in python instead of cpp.
