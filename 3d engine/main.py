@@ -116,14 +116,19 @@ while running == True:
             triProjected[2][0] *= 0.5 * screen.get_width()
             triProjected[2][1] *= 0.5 * screen.get_height()
             triProjected[3] = shading
+            print(shading)
 
             mesh.append(triProjected)
 
     mesh.sort(key=sortByAverageZ, reverse=True)
 
     for tri in mesh:
-        print(tri[3])
         pygame.draw.polygon(screen, (tri[3], tri[3], tri[3]), ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
+
+        #draw as mesh outline
+        #pygame.draw.line(screen, (255, 255, 255), (tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]))
+        #pygame.draw.line(screen, (255, 255, 255), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1]))
+        #pygame.draw.line(screen, (255, 255, 255), (tri[2][0], tri[2][1]), (tri[0][0], tri[0][1]))
 
     #update entire display
     pygame.display.flip()
