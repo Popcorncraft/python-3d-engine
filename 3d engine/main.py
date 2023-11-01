@@ -31,8 +31,8 @@ running = True
 #init variables
 theta = 0
 lastFrameTicks = 1
-selectedModel = createMeshFromOBJ("3d engine/assets/teapot.obj")
-mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], [0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]]]
+selectedModel = createMeshFromOBJ("3d engine/assets/ship.obj")
+mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]]
 
 #main loop
 while running == True:
@@ -49,6 +49,9 @@ while running == True:
                 pygame.display.toggle_fullscreen()
     #clear screen
     screen.fill("black")
+
+    #clear mesh
+    mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]]
 
     #update relavent variables
     aspectRatio = screen.get_height() / screen.get_width()
@@ -91,7 +94,7 @@ while running == True:
 
         if (dotProduct(normalizedNormal, cameraRay)) > 0:
             #project onto screen
-            triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0]]
+            triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]
             triProjected[0] = matrixMultiplyVector(matProj, triTransformed[0])
             triProjected[1] = matrixMultiplyVector(matProj, triTransformed[1])
             triProjected[2] = matrixMultiplyVector(matProj, triTransformed[2])
@@ -116,9 +119,10 @@ while running == True:
 
             mesh.append(triProjected)
 
-    mesh.sort(key=sortByAverageZ)
+    mesh.sort(key=sortByAverageZ, reverse=True)
 
     for tri in mesh:
+        print(tri[3])
         pygame.draw.polygon(screen, (tri[3], tri[3], tri[3]), ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
 
     #update entire display

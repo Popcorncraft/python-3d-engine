@@ -21,6 +21,8 @@ def vecLength(v):
 
 def normalizeVector(v):
     l = vecLength(v)
+    if l == 0:
+        l = 1
     return([v[0] / l, v[1] / l, v[2] / l])
 
 def crossProduct(v1, v2):
