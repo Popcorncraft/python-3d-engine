@@ -18,7 +18,7 @@ screenWidth = 1280
 screenHeight = 720
 cameraPos = [0, 0, 0, 1]
 cameraRot = [0, 0, 0, 1]
-lightingDirection = [0, 0, -1, 1]
+lightingDirection = [1, 0, 0, 1]
 
 #pygame setup
 pygame.init()
@@ -92,7 +92,7 @@ while running == True:
         #camera ray
         cameraRay = subVec(triTransformed[0], cameraPos)
 
-        if (dotProduct(normalizedNormal, cameraRay)) > 0:
+        if (dotProduct(normalizedNormal, normalizeVector(cameraRay))) > 0:
             #project onto screen
             triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]
             triProjected[0] = matrixMultiplyVector(matProj, triTransformed[0])
@@ -116,7 +116,6 @@ while running == True:
             triProjected[2][0] *= 0.5 * screen.get_width()
             triProjected[2][1] *= 0.5 * screen.get_height()
             triProjected[3] = shading
-            print(shading)
 
             mesh.append(triProjected)
 
