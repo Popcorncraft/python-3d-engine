@@ -31,7 +31,7 @@ running = True
 #init variables
 theta = 0
 lastFrameTicks = 1
-selectedModel = createMeshFromOBJ("3d engine/assets/ship.obj")
+selectedModel = createMeshFromOBJ("3d engine/assets/teapot.obj")
 mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]]
 
 #main loop
@@ -81,18 +81,22 @@ while running == True:
 
         #get normal
         normal = [0, 0, 0, 1]
-        normalizedNormal = [0, 0, 0, 1]
-        normal = calculateNormal(tri)
-        normalizedNormal = normalizeVector(normal)
+
+        line1 = subVec(triTransformed[1], triTransformed[0])
+        line2 = subVec(triTransformed[2], triTransformed[0])
+
+        normal = crossProduct(line1, line2)
+
+        normal = normalizeVector(normal)
 
         #one direction light
         lightingDirection = normalizeVector(lightingDirection)
-        shading = ((dotProduct(normalizedNormal, lightingDirection) + 1) / 2) * 255
+        shading = ((dotProduct(normal, lightingDirection) + 1) / 2) * 255
 
         #camera ray
         cameraRay = subVec(triTransformed[0], cameraPos)
 
-        if (dotProduct(normalizedNormal, normalizeVector(cameraRay))) > 0:
+        if (dotProduct(normal, normalizeVector(cameraRay))) < 0:
             #project onto screen
             triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]
             triProjected[0] = matrixMultiplyVector(matProj, triTransformed[0])
