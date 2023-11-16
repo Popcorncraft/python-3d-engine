@@ -39,15 +39,15 @@ def makeZRotMatrix(angleRad):
     matrix[3][3] = 1
     return(matrix)
 
-def makeTranslationMatrix(x, y, z):
+def makeTranslationMatrix(v = [0, 0, 0]):
     matrix = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
     matrix[0][0] = 1
     matrix[1][1] = 1
     matrix[2][2] = 1
     matrix[3][3] = 1
-    matrix[3][0] = x
-    matrix[3][1] = y
-    matrix[3][2] = z
+    matrix[3][0] = -v[0]
+    matrix[3][1] = -v[1]
+    matrix[3][2] = -v[2]
     return(matrix)
 
 def makeProjMatrix(fovDeg, aspectRatio, viewNear, viewFar):
