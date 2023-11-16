@@ -19,8 +19,8 @@ screenHeight = 720
 cameraPos = [0, 0, 0, 1]
 cameraRot = [0, 0, 0, 1]
 lightingDirection = [0, 1, -1, 1]
-cameraVelocity = 10
-rotationVelocity = 1
+cameraMoveVelocity = 10
+cameraRotationVelocity = 1
 
 #pygame setup
 pygame.init()
@@ -34,17 +34,10 @@ running = True
 theta = 0
 lastFrameTicks = 1
 mesh = [[[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]]
-objectpath = ["3d engine/assets/axis.obj", "3d engine/assets/ship.obj"]
-objectposition = [[0, 0, 10], [20, 10, 10]]
-objectrotation = [[0, 0, 0], [0, 0, 0]]
-objectid = [0, 1]
-
-moveMap = {pygame.K_w: [0, 0, 1], pygame.K_s: [0, 0, -1], 
-            pygame.K_SPACE: [0, 1, 0], pygame.K_LSHIFT: [0, -1, 0], 
-            pygame.K_a: [1, 0, 0], pygame.K_d: [-1, 0, 0]}
-
-rotMap = {pygame.K_UP: [3.14159 / 180, 0, 0], pygame.K_DOWN: [-3.14159 / 180, 0, 0],
-    pygame.K_LEFT: [0, 3.14159 / 180, 0], pygame.K_RIGHT: [0, -3.14159 / 180, 0]}
+objectpath = ["3d engine/assets/axis.obj"]
+objectposition = [[0, 0, 10]]
+objectrotation = [[0, 0, 0]]
+objectid = [0]
 
 #main loop
 while running == True:
@@ -59,27 +52,28 @@ while running == True:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_F11:
                 pygame.display.toggle_fullscreen()
-    
-    move = [0, 0, 0]
-    rotate = [0, 0, 0]
-    pressed = pygame.key.get_pressed()
-    #move and rotate keybindings
-    for key in moveMap:
-        if pressed[key]:
-            move = addVec(move, moveMap[key])
-
-    for key in rotMap:
-        if pressed[key]:
-            rotate = addVec(rotate, rotMap[key])
 
     #calculate deltaTime
     t = pygame.time.get_ticks()
     deltaTime = (t - lastFrameTicks) / 1000
     lastFrameTicks = t
 
-    #update camera position and rotation
-    cameraPos = addVec(cameraPos, multVec(normalizeVector(move), cameraVelocity * deltaTime))
-    cameraRot = addVec(cameraRot, multVec(normalizeVector(rotate), rotationVelocity * deltaTime))
+    #camera controls
+    pressed = pygame.key.get_pressed()
+    #basic sliding
+    if pressed[pygame.K_a]:
+        cameraPos[2] += cameraMoveVelocity * deltaTime
+    if pressed[pygame.K_d]:
+        cameraPos[2] -= cameraMoveVelocity * deltaTime
+    if pressed[pygame.K_SPACE]:
+        cameraPos[1] += cameraMoveVelocity * deltaTime
+    if pressed[pygame.K_LSHIFT]:
+        cameraPos[1] -= cameraMoveVelocity * deltaTime
+    #moving along the forwards vector
+    if pressed[pygame.K_w]:
+        cameraPos = addVec(cameraPos, cameraRot)
+    if pressed[pygame.K_s]:
+        cameraPos = addVec(cameraPos, cameraRot)
 
     #clear screen
     screen.fill("black")
@@ -90,23 +84,31 @@ while running == True:
     #update relavent variables
     aspectRatio = screen.get_height() / screen.get_width()
 
+    #set up basic matricies
+    matProj = makeProjMatrix(fov, aspectRatio, viewNear, viewFar)
+    matRotZ = makeZRotMatrix(objectrotation[model][2])
+    matRotX = makeXRotMatrix(objectrotation[model][0])
+    matRotY = makeYRotMatrix(objectrotation[model][1])
+    matTrans = makeTranslationMatrix(subVec(cameraPos, objectposition[model]))
+
+    #set up world matrix
+    matWorld = makeIdentityMatrix()
+    matWorld = matTrans
+    matWorld = matrixMultiplyMatrix(matWorld, matRotX)
+    matWorld = matrixMultiplyMatrix(matWorld, matRotY)
+    matWorld = matrixMultiplyMatrix(matWorld, matRotZ)
+
+    #Camera Matrix
+    upVec = [0, 1, 0]
+    targetVec = addVec(cameraPos, cameraRot)
+    matCamera = makePointAtMatrix(cameraPos, targetVec, upVec)
+    matView = invertMatrix(matCamera)
+
     for model in objectid:
         #load object file
         selectedModel = createMeshFromOBJ(objectpath[model])
 
-        #set up basic matricies
-        matProj = makeProjMatrix(fov, aspectRatio, viewNear, viewFar)
-        matRotX = makeXRotMatrix(cameraRot[0] + objectrotation[model][0])
-        matRotY = makeYRotMatrix(cameraRot[1] + objectrotation[model][1])
-        matRotZ = makeZRotMatrix(cameraRot[2] + objectrotation[model][2])
-        matTrans = makeTranslationMatrix(subVec(cameraPos, objectposition[model]))
-
-        #set up world matrix
-        matWorld = makeIdentityMatrix()
-        matWorld = matTrans
-        matWorld = matrixMultiplyMatrix(matWorld, matRotX)
-        matWorld = matrixMultiplyMatrix(matWorld, matRotY)
-        matWorld = matrixMultiplyMatrix(matWorld, matRotZ)
+        
 
         for tri in selectedModel:
             triTransformed = [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]
@@ -132,11 +134,17 @@ while running == True:
             cameraRay = subVec(triTransformed[0], cameraPos)
 
             if (dotProduct(normal, normalizeVector(cameraRay))) < 0:
+                #convert world space to view space
+                triViewed = [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]
+                triViewed[0] = matrixMultiplyVector(matView, triTransformed[0])
+                triViewed[1] = matrixMultiplyVector(matView, triTransformed[1])
+                triViewed[2] = matrixMultiplyVector(matView, triTransformed[2])
+
                 #project onto screen
                 triProjected = [[0, 0, 0], [0, 0, 0], [0, 0, 0], 0]
-                triProjected[0] = matrixMultiplyVector(matProj, triTransformed[0])
-                triProjected[1] = matrixMultiplyVector(matProj, triTransformed[1])
-                triProjected[2] = matrixMultiplyVector(matProj, triTransformed[2])
+                triProjected[0] = matrixMultiplyVector(matProj, triViewed[0])
+                triProjected[1] = matrixMultiplyVector(matProj, triViewed[1])
+                triProjected[2] = matrixMultiplyVector(matProj, triViewed[2])
 
                 triProjected[0] = divVec(triProjected[0], triProjected[0][3])
                 triProjected[1] = divVec(triProjected[1], triProjected[1][3])
