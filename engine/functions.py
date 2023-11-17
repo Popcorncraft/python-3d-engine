@@ -1,3 +1,5 @@
+from operationFunctions import *
+
 def createMeshFromOBJ(path):
     file = open(path)
     vectors = []
