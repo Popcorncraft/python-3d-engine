@@ -4,3 +4,4 @@ class meshObject:
         self.path = path
         self.position = postition
         self.rotation = rotation
+        self.mesh = createMeshFromOBJ(path)

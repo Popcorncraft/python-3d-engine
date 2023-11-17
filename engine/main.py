@@ -18,7 +18,11 @@ camera = [0, 0, 0, 1]
 lookDir = [0, 0, 1, 1]
 yaw = 0
 theta = 0
-mesh = createMeshFromOBJ("engine/assets/teapot.obj")
+
+#object init
+test = meshObject(0, "engine/assets/cube.obj", [10, 0, 10], [0, 0, 0])
+test2 = meshObject(1, "engine/assets/axis.obj", [-10, 0, 10], [0, 0, 0])
+objectList = [test, test2]
 
 #pygame setup
 pygame.init()
