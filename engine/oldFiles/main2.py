@@ -5,7 +5,6 @@ import math
 
 #import files
 from functions import *
-from debugAssets import *
 from settings import *
 from vectorFunctions import *
 from matrixFunctions import *

@@ -1,7 +1,3 @@
-import math
-from variableClasses import *
-from vectorFunctions import *
-
 def createMeshFromOBJ(path):
     file = open(path)
     vectors = [[0, 0, 0, 1]]
@@ -24,6 +20,4 @@ def createMeshFromOBJ(path):
     return(mesh)
 
 def sortByAverageZ(tri):
-    sum = tri[0][2] + tri[1][2] + tri[2][2]
-    average = sum / 3
-    return(average)
+    return((tri[0][2] + tri[1][2] + tri[2][2]) / 3)

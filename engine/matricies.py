@@ -1,6 +1,5 @@
 import math
-from variableClasses import *
-from vectorFunctions import *
+from operationFunctions import *
 
 def makeIdentityMatrix():
     matrix = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
@@ -64,14 +63,14 @@ def makeProjMatrix(fovDeg, aspectRatio, viewNear, viewFar):
 
 def makePointAtMatrix(position, target, upVec):
     #calculate new forward
-    newForward = normalizeVector(subVec(target, position))
+    newForward = vecNormalize(vecSub(target, position))
 
     #calculate new up
-    a = multVec(newForward, dotProduct(upVec, newForward))
-    newUp = normalizeVector(subVec(upVec, a))
+    a = vecMult(newForward, vecDotProduct(upVec, newForward))
+    newUp = vecNormalize(vecSub(upVec, a))
 
     #calculate new right direction
-    newRight = crossProduct(newUp, newForward)
+    newRight = vecCrossProduct(newUp, newForward)
 
     #set up matrix
     matrix = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
@@ -111,18 +110,3 @@ def invertMatrix(m): #ONLY FOR POINT AT MATRIX
     matrix[3][1] = -(m[3][0] * matrix[0][1] + m[3][1] * matrix[1][1] + m[3][2] * matrix[2][1])
     matrix[3][2] = -(m[3][0] * matrix[0][2] + m[3][1] * matrix[1][2] + m[3][2] * matrix[2][2])
     matrix[3][3] = 1
-
-def matrixMultiplyVector(m, v):
-    o = [0, 0, 0, 1]
-    o[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0] + v[3] * m[3][0]
-    o[1] = v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1] + v[3] * m[3][1]
-    o[2] = v[0] * m[0][2] + v[1] * m[1][2] + v[2] * m[2][2] + v[3] * m[3][2]
-    o[3] = v[0] * m[0][3] + v[1] * m[1][3] + v[2] * m[2][3] + v[3] * m[3][3]
-    return(o)
-
-def matrixMultiplyMatrix(m1, m2):
-    matrix = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    for c in range(0, 4):
-        for r in range(0, 4):
-            matrix[r][c] = m1[r][0] * m2[0][c] + m1[r][1] * m2[1][c] + m1[r][2] * m2[2][c] + m1[r][3] * m2[3][c]
-    return(matrix)
