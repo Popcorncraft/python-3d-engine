@@ -10,7 +10,7 @@ def vecSub(v1, v2):
 def vecMult(v, k):
     return([v[0] * k, v[1] * k, v[2] * k])
 
-def vecdiv(v, k):
+def vecDiv(v, k):
     return([v[0] / k, v[1] / k, v[2] / k])
 
 def vecDotProduct(v1, v2):
@@ -34,6 +34,8 @@ def vecCrossProduct(v1, v2):
 
 #Matrix Operations
 def vecMultMatrix(m, v):
+    if len(v) == 3:
+        v.append(1)
     o = [0, 0, 0, 1]
     o[0] = v[0] * m[0][0] + v[1] * m[1][0] + v[2] * m[2][0] + v[3] * m[3][0]
     o[1] = v[0] * m[0][1] + v[1] * m[1][1] + v[2] * m[2][1] + v[3] * m[3][1]

@@ -110,3 +110,4 @@ def invertMatrix(m): #ONLY FOR POINT AT MATRIX
     matrix[3][1] = -(m[3][0] * matrix[0][1] + m[3][1] * matrix[1][1] + m[3][2] * matrix[2][1])
     matrix[3][2] = -(m[3][0] * matrix[0][2] + m[3][1] * matrix[1][2] + m[3][2] * matrix[2][2])
     matrix[3][3] = 1
+    return(matrix)
