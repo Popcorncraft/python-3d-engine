@@ -96,7 +96,7 @@ while running == True:
     matRotX = makeXRotMatrix(0)
     matRotY = makeYRotMatrix(0)
     matRotZ = makeZRotMatrix(0)
-    matTrans = makeTranslationMatrix([0, 0, 5])
+    matTrans = makeTranslationMatrix([0, 0, -15])
     matProj = makeProjMatrix(fov, (screen.get_height() / screen.get_width()), 0.1, 1000)
         
     #create world matrix
@@ -152,16 +152,16 @@ while running == True:
             triViewed[2] = vecMultMatrix(matView, triTransformed[2])
 
             #clip viewed triangles angainst near plane
-            clippedTriangles = 0
-            clipResults = triClipAgainstPlane([0, 0, 0.1], [0, 0, 1], triViewed)
+            clipped = [[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]], [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]]
+            clipResults = triClipAgainstPlane([0, 0, 0.1], [0, 0, 1], triViewed, clipped[0], clipped[1])
 
             #loop over all triangles since some might have been created during clipping
-            for n in range(0, clipResults[0]):
+            for n in range(0, clipResults):
 
                 #project tris
-                triProjected[0] = vecMultMatrix(matProj, clipResults[n+1][0])
-                triProjected[1] = vecMultMatrix(matProj, clipResults[n+1][1])
-                triProjected[2] = vecMultMatrix(matProj, clipResults[n+1][2])
+                triProjected[0] = vecMultMatrix(matProj, clipped[n][0])
+                triProjected[1] = vecMultMatrix(matProj, clipped[n][1])
+                triProjected[2] = vecMultMatrix(matProj, clipped[n][2])
 
                 #scale into view
                 triProjected[0] = vecDiv(triProjected[0], triProjected[0][3])
@@ -194,40 +194,42 @@ while running == True:
     
     triToRaster.sort(key=sortByAverageZ)
     
+    listTriangles = []
+
     for tri in triToRaster:
-        #queue for generated triangles
-        listTriangles = []
 
         #add inital triangle
         listTriangles.append(tri)
         newTriangles = 1
 
         for p in range(0, 4):
-            clipResults = []
+            clipResults = 0
             while newTriangles > 0:
                 #grab triangle from front of queue
                 test = listTriangles.pop(0)
                 newTriangles -= 1
                 print(test)
 
+                clipped = [[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]], [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]]
+
                 #clip tri against a plane.
                 match p:
                     case 0:
-                        clipResults = triClipAgainstPlane([0, 0, 0], [0, 0, 0], test[0])
+                        clipResults = triClipAgainstPlane([0, 0, 0], [0, 0, 0], test[0], clipped[0], clipped[1])
                     case 1:
-                        clipResults = triClipAgainstPlane([0, screen.get_height() - 1, 0], [0, -1, 0], test)
+                        clipResults = triClipAgainstPlane([0, screen.get_height() - 1, 0], [0, -1, 0], test[0], clipped[0], clipped[1])
                     case 2:
-                        clipResults = triClipAgainstPlane([0, 0, 0], [1, 0, 0], test)
+                        clipResults = triClipAgainstPlane([0, 0, 0], [1, 0, 0], test[0], clipped[0], clipped[1])
                     case 3:
-                        clipResults = triClipAgainstPlane([screen.get_width() - 1, 0, 0], [-1, 0, 0], test)
+                        clipResults = triClipAgainstPlane([screen.get_width() - 1, 0, 0], [-1, 0, 0], test[0], clipped[0], clipped[1])
 
-                for i in range(0, clipResults[0]):
-                    listTriangles.append(clipResults[i+1])
+                for i in range(0, clipResults):
+                    listTriangles.append(clipped[i])
             newTriangles = len(listTriangles)
         
     
     for tri in listTriangles:
-        print(((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
+        #print(((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
         pygame.draw.polygon(screen, "white", ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
 
     pygame.display.flip()

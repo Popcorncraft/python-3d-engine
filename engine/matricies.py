@@ -58,7 +58,7 @@ def makeProjMatrix(fovDeg, aspectRatio, viewNear, viewFar):
     matrix[2][2] = viewFar / (viewFar - viewNear)
     matrix[3][2] = (-viewFar * viewNear) / (viewFar - viewNear)
     matrix[2][3] = 1
-    matrix[3][3] = 0
+    matrix[3][3] = 1
     return(matrix)
 
 def makePointAtMatrix(position, target, upVec):
