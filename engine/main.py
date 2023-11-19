@@ -26,7 +26,7 @@ tester = False
 #object init
 #axis = meshObject(0, "engine/assets/axis.obj", [0, 0, 5, 1], [0, 0, 0, 1])
 #objectList = [axis]
-mesh = createMeshFromOBJ("engine/assets/axis.obj")
+mesh = createMeshFromOBJ("engine/assets/ship.obj")
 
 #pygame setup
 pygame.init()
@@ -227,7 +227,7 @@ while running == True:
         
     
     for tri in listTriangles:
-        #print(((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
+        print(((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
         pygame.draw.polygon(screen, "white", ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
 
     pygame.display.flip()
