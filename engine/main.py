@@ -1,7 +1,5 @@
 #import modules
 import pygame
-import math
-import time
 
 global clipped
 
@@ -27,7 +25,7 @@ listTriangles = []
 #object init
 #axis = meshObject(0, "engine/assets/axis.obj", [0, 0, 5, 1], [0, 0, 0, 1])
 #objectList = [axis]
-mesh = createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/axis.obj")
+mesh = createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/ship.obj")
 
 #pygame setup
 pygame.init()
