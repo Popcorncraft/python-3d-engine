@@ -3,6 +3,8 @@ import pygame
 import math
 import time
 
+global clipped
+
 #import files
 from matricies import *
 from operationFunctions import *
@@ -14,19 +16,18 @@ cameraMoveVel = 10
 cameraRotateVel = 1
 
 #variable init
-camera = [0, 0, 0, 1]
-lookDir = [0, 0, 1, 1]
+camera = vec3d()
+lookDir = vec3d(0, 0, 1, 1)
 yaw = 0
 theta = 0
 fov = 90
 triToRaster = []
 listTriangles = []
-tester = False
 
 #object init
 #axis = meshObject(0, "engine/assets/axis.obj", [0, 0, 5, 1], [0, 0, 0, 1])
 #objectList = [axis]
-mesh = createMeshFromOBJ("engine/assets/ship.obj")
+mesh = createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/axis.obj")
 
 #pygame setup
 pygame.init()
@@ -58,12 +59,13 @@ while running == True:
     aspectRatio = screen.get_height() / screen.get_width()
 
     #update camera vectors
-    upVec = [0, 1, 0, 1]
-    target = [0, 0, 1, 1]
+    upVec = vec3d(0, 1, 0)
+    target = vec3d(0, 0, 1)
     matCameraRot = makeYRotMatrix(yaw)
     lookDir = vecMultMatrix(matCameraRot, target)
     target = vecAdd(camera, lookDir)
     matCamera = makePointAtMatrix(camera, target, upVec)
+    rightVec = vecCrossProduct(upVec, lookDir)
 
     #make view matrix from camera
     matView = invertMatrix(matCamera)
@@ -71,23 +73,23 @@ while running == True:
     #controls
     pressed = pygame.key.get_pressed()
     #movement
-    #if pressed[pygame.K_w]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(lookDir), (cameraMoveVel * dt)))
-    #if pressed[pygame.K_s]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(lookDir), -(cameraMoveVel * dt)))
-    #if pressed[pygame.K_d]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(rightVec), (cameraMoveVel * dt)))
-    #if pressed[pygame.K_a]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(rightVec), -(cameraMoveVel * dt)))
-    #if pressed[pygame.K_SPACE]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(upVec), (cameraMoveVel * dt)))
-    #if pressed[pygame.K_LSHIFT]:
-    #    camera = vecAdd(camera, vecMult(vecNormalize(upVec), -(cameraMoveVel * dt)))
+    if pressed[pygame.K_w]:
+        camera = vecAdd(camera, vecMul(vecNormalize(lookDir), -(cameraMoveVel * dt)))
+    if pressed[pygame.K_s]:
+        camera = vecAdd(camera, vecMul(vecNormalize(lookDir), (cameraMoveVel * dt)))
+    if pressed[pygame.K_d]:
+        camera = vecAdd(camera, vecMul(vecNormalize(rightVec), -(cameraMoveVel * dt)))
+    if pressed[pygame.K_a]:
+        camera = vecAdd(camera, vecMul(vecNormalize(rightVec), (cameraMoveVel * dt)))
+    if pressed[pygame.K_SPACE]:
+        camera = vecAdd(camera, vecMul(vecNormalize(upVec), (cameraMoveVel * dt)))
+    if pressed[pygame.K_LSHIFT]:
+        camera = vecAdd(camera, vecMul(vecNormalize(upVec), -(cameraMoveVel * dt)))
     #rotation
-    #if pressed[pygame.K_LEFT]:
-    #    yaw -= cameraRotateVel * dt
-    #if pressed[pygame.K_RIGHT]:
-    #    yaw += cameraRotateVel * dt
+    if pressed[pygame.K_LEFT]:
+        yaw += cameraRotateVel * dt
+    if pressed[pygame.K_RIGHT]:
+        yaw -= cameraRotateVel * dt
 
     triToRaster = []
     
@@ -96,7 +98,7 @@ while running == True:
     matRotX = makeXRotMatrix(0)
     matRotY = makeYRotMatrix(0)
     matRotZ = makeZRotMatrix(0)
-    matTrans = makeTranslationMatrix([0, 0, -15])
+    matTrans = makeTranslationMatrix([0, 0, 15])
     matProj = makeProjMatrix(fov, (screen.get_height() / screen.get_width()), 0.1, 1000)
         
     #create world matrix
@@ -107,23 +109,23 @@ while running == True:
 
     for tri in mesh:
         #clear vectors
-        triProjected = [0, 0, 0, 1]
-        triTransformed = [0, 0, 0, 1]
-        triViewed = [0, 0, 0, 1]
+        triProjected = triangle()
+        triTransformed = triangle()
+        triViewed = triangle()
 
         #world matrix transform
-        triTransformed[0] = vecMultMatrix(matWorld, tri[0])
-        triTransformed[1] = vecMultMatrix(matWorld, tri[1])
-        triTransformed[2] = vecMultMatrix(matWorld, tri[2])
+        triTransformed.v1 = vecMultMatrix(matWorld, tri[0])
+        triTransformed.v2 = vecMultMatrix(matWorld, tri[1])
+        triTransformed.v3 = vecMultMatrix(matWorld, tri[2])
 
         #calculate tri normal
-        normal = [0, 0, 0, 1]
-        line1 = [0, 0, 0, 1]
-        line2 = [0, 0, 0, 1]
+        normal = vec3d()
+        line1 = vec3d()
+        line2 = vec3d()
 
         #calculate sides of triangle
-        line1 = vecSub(triTransformed[1], triTransformed[0])
-        line2 = vecSub(triTransformed[2], triTransformed[0])
+        line1 = vecSub(triTransformed.v2, triTransformed.v1)
+        line2 = vecSub(triTransformed.v3, triTransformed.v1)
 
         #cross product of lines to get normal of triangle
         normal = vecCrossProduct(line1, line2)
@@ -132,28 +134,28 @@ while running == True:
         normal = vecNormalize(normal)
 
         #get ray from triangle to camera
-        cameraRay = vecSub(triTransformed[0], camera)
+        cameraRay = vecSub(triTransformed.v1, camera)
 
         #if ray is aligned with normal the triangle is visible
         if vecDotProduct(normal, cameraRay) < 0:
             #illumination
-            lightDirection = [0, 1, -1]
+            lightDirection = vec3d(0, 1, 1)
             lightDirection = vecNormalize(lightDirection)
 
             #how aligned the lightDirection and normal
-            dp = max(0.1, vecDotProduct(lightDirection, normal))
+            dp = ((max(vecDotProduct(normal, lightDirection), 0) + 1) / 2) * 255
 
             #set color
             color = [dp, dp, dp]
 
             #convert world space to view space
-            triViewed[0] = vecMultMatrix(matView, triTransformed[0])
-            triViewed[1] = vecMultMatrix(matView, triTransformed[1])
-            triViewed[2] = vecMultMatrix(matView, triTransformed[2])
+            triViewed.v1 = vecMultMatrix(matView, triTransformed.v1)
+            triViewed.v2 = vecMultMatrix(matView, triTransformed.v2)
+            triViewed.v3 = vecMultMatrix(matView, triTransformed.v3)
 
             #clip viewed triangles angainst near plane
-            clipped = [[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]], [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]]
-            clipResults = triClipAgainstPlane([0, 0, 0.1], [0, 0, 1], triViewed, clipped[0], clipped[1])
+            clipped = [triangle(), triangle()]
+            clipResults = testClip(vec3d(0, 0, 0.1), vec3d(0, 0, 1), triViewed)
 
             #loop over all triangles since some might have been created during clipping
             for n in range(0, clipResults):
@@ -187,12 +189,13 @@ while running == True:
                 triProjected[1][1] *= 0.5 * screen.get_height()
                 triProjected[2][0] *= 0.5 * screen.get_width()
                 triProjected[2][1] *= 0.5 * screen.get_height()
+                triProjected.col = color
 
                 #add tri to list for sorting
-                triToRaster.append([triProjected, color])
+                triToRaster.append(triProjected)
 
     
-    triToRaster.sort(key=sortByAverageZ)
+    triToRaster.sort(key=sortByAverageZ, reverse=False)
     
     listTriangles = []
 
@@ -207,21 +210,20 @@ while running == True:
             while newTriangles > 0:
                 #grab triangle from front of queue
                 test = listTriangles.pop(0)
-                newTriangles -= 1
-                print(test)
 
-                clipped = [[[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]], [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]]]
+                newTriangles -= 1
+
+                clipped = [triangle(), triangle()]
 
                 #clip tri against a plane.
-                match p:
-                    case 0:
-                        clipResults = triClipAgainstPlane([0, 0, 0], [0, 0, 0], test[0], clipped[0], clipped[1])
-                    case 1:
-                        clipResults = triClipAgainstPlane([0, screen.get_height() - 1, 0], [0, -1, 0], test[0], clipped[0], clipped[1])
-                    case 2:
-                        clipResults = triClipAgainstPlane([0, 0, 0], [1, 0, 0], test[0], clipped[0], clipped[1])
-                    case 3:
-                        clipResults = triClipAgainstPlane([screen.get_width() - 1, 0, 0], [-1, 0, 0], test[0], clipped[0], clipped[1])
+                if p == 0:
+                    clipResults = triClipAgainstPlane(vec3d(), vec3d(), test)
+                elif p == 1:
+                    clipResults = triClipAgainstPlane(vec3d(0, screen.get_height() - 1, 0), vec3d(0, -1, 0), test)
+                elif p == 2:
+                    clipResults = triClipAgainstPlane(vec3d(), vec3d(1, 0, 0), test)
+                elif p == 3:
+                    clipResults = triClipAgainstPlane(vec3d(screen.get_width() - 1, 0, 0), vec3d(-1, 0, 0), test)
 
                 for i in range(0, clipResults):
                     listTriangles.append(clipped[i])
@@ -229,8 +231,7 @@ while running == True:
         
     
     for tri in listTriangles:
-        #print(((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
-        pygame.draw.polygon(screen, "white", ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
+        pygame.draw.polygon(screen, tri.col, ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
 
     pygame.display.flip()
 

@@ -66,7 +66,7 @@ def makePointAtMatrix(position, target, upVec):
     newForward = vecNormalize(vecSub(target, position))
 
     #calculate new up
-    a = vecMult(newForward, vecDotProduct(upVec, newForward))
+    a = vecMul(newForward, vecDotProduct(upVec, newForward))
     newUp = vecNormalize(vecSub(upVec, a))
 
     #calculate new right direction
@@ -74,21 +74,21 @@ def makePointAtMatrix(position, target, upVec):
 
     #set up matrix
     matrix = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
-    matrix[0][0] = newRight[0]
-    matrix[0][1] = newRight[1]
-    matrix[0][2] = newRight[2]
+    matrix[0][0] = newRight.x
+    matrix[0][1] = newRight.y
+    matrix[0][2] = newRight.z
     matrix[0][3] = 0
-    matrix[1][0] = newUp[0]
-    matrix[1][1] = newUp[1]
-    matrix[1][2] = newUp[2]
+    matrix[1][0] = newUp.x
+    matrix[1][1] = newUp.y
+    matrix[1][2] = newUp.z
     matrix[1][3] = 0
-    matrix[2][0] = newForward[0]
-    matrix[2][1] = newForward[1]
-    matrix[2][2] = newForward[2]
+    matrix[2][0] = newForward.x
+    matrix[2][1] = newForward.y
+    matrix[2][2] = newForward.z
     matrix[2][3] = 0
-    matrix[3][0] = position[0]
-    matrix[3][1] = position[1]
-    matrix[3][2] = position[2]
+    matrix[3][0] = position.x
+    matrix[3][1] = position.y
+    matrix[3][2] = position.z
     matrix[3][3] = 1
     return(matrix)
 
