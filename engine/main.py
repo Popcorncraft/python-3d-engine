@@ -155,7 +155,7 @@ while running == True:
 
             #clip viewed triangles angainst near plane
             clipped = [triangle(), triangle()]
-            clipResults = testClip(vec3d(0, 0, 0.1), vec3d(0, 0, 1), triViewed)
+            clipResults = testClip(vec3d(0, 0, -2), vec3d(0, 0, 1), triViewed)
 
             #loop over all triangles since some might have been created during clipping
             for n in range(0, clipResults):
@@ -232,6 +232,9 @@ while running == True:
     
     for tri in listTriangles:
         pygame.draw.polygon(screen, tri.col, ((tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1])))
+        pygame.draw.line(screen, "black", (tri[0][0], tri[0][1]), (tri[1][0], tri[1][1]))
+        pygame.draw.line(screen, "black", (tri[1][0], tri[1][1]), (tri[2][0], tri[2][1]))
+        pygame.draw.line(screen, "black", (tri[2][0], tri[2][1]), (tri[0][0], tri[0][1]))
 
     pygame.display.flip()
 
