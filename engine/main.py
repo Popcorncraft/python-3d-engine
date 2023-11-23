@@ -1,8 +1,6 @@
 #import modules
 import pygame
 
-global clipped
-
 #import files
 from matricies import *
 from operationFunctions import *
@@ -25,7 +23,17 @@ listTriangles = []
 #object init
 #axis = meshObject(0, "engine/assets/axis.obj", [0, 0, 5, 1], [0, 0, 0, 1])
 #objectList = [axis]
-mesh = createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/ship.obj")
+print("0 for cube")
+print("1 for axis")
+print("2 for ship")
+print("3 for teapot")
+choice = {
+    '0': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/cube.obj"),
+    '1': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/axis.obj"),
+    '2': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/ship.obj"),
+    '3': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/teapot.obj")
+}
+mesh = choice['3']
 
 #pygame setup
 pygame.init()
@@ -153,11 +161,13 @@ while running == True:
 
             #clip viewed triangles angainst near plane
             clipped = [triangle(), triangle()]
-            clipResults = testClip(vec3d(0, 0, -2), vec3d(0, 0, 1), triViewed)
+            #clipResults, clipped[0], clipped[1] = testClip(vec3d(0, 0, -2), vec3d(0, 0, 1), triViewed)
+            clipped[0] = triViewed
+            clipResults = 1
 
             #loop over all triangles since some might have been created during clipping
             for n in range(0, clipResults):
-
+            
                 #project tris
                 triProjected[0] = vecMultMatrix(matProj, clipped[n][0])
                 triProjected[1] = vecMultMatrix(matProj, clipped[n][1])
@@ -198,13 +208,12 @@ while running == True:
     listTriangles = []
 
     for tri in triToRaster:
-
+    
         #add inital triangle
         listTriangles.append(tri)
         newTriangles = 1
 
         for p in range(0, 4):
-            clipResults = 0
             while newTriangles > 0:
                 #grab triangle from front of queue
                 test = listTriangles.pop(0)
@@ -212,16 +221,17 @@ while running == True:
                 newTriangles -= 1
 
                 clipped = [triangle(), triangle()]
+                clipResults = 0
 
                 #clip tri against a plane.
                 if p == 0:
-                    clipResults = triClipAgainstPlane(vec3d(), vec3d(), test)
+                    clipResults, clipped[0], clipped[1] = testClip(vec3d(), vec3d(0, -1, 0), test)
                 elif p == 1:
-                    clipResults = triClipAgainstPlane(vec3d(0, screen.get_height() - 1, 0), vec3d(0, -1, 0), test)
+                    clipResults, clipped[0], clipped[1] = testClip(vec3d(0, -screen.get_height() + 1, 0), vec3d(0, -1, 0), test)
                 elif p == 2:
-                    clipResults = triClipAgainstPlane(vec3d(), vec3d(1, 0, 0), test)
+                    clipResults, clipped[0], clipped[1] = testClip(vec3d(), vec3d(-1, 0, 0), test)
                 elif p == 3:
-                    clipResults = triClipAgainstPlane(vec3d(screen.get_width() - 1, 0, 0), vec3d(-1, 0, 0), test)
+                    clipResults, clipped[0], clipped[1] = testClip(vec3d(-screen.get_width() + 1, 0, 0), vec3d(-1, 0, 0), test)
 
                 for i in range(0, clipResults):
                     listTriangles.append(clipped[i])
