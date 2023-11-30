@@ -33,7 +33,7 @@ choice = {
     '2': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/ship.obj"),
     '3': createMeshFromOBJ("C:/Users/there/OneDrive/Documents/Projects/Personal/PythonEngine/git/engine/assets/teapot.obj")
 }
-mesh = choice['3']
+mesh = choice['1']
 
 #pygame setup
 pygame.init()

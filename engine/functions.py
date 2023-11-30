@@ -16,6 +16,10 @@ def createMeshFromOBJ(path):
 def sortByAverageZ(tri):
     return((tri[0][2] + tri[1][2] + tri[2][2]) / 3)
 
+def sortByDistFromCamera(tri):
+    from main import camera
+    return((vecLength(vecSub(tri[0], camera)) + vecLength(vecSub(tri[1], camera)) + vecLength(vecSub(tri[2], camera))) / 3)
+
 def vecIntersectPlane(planeP, planeN, lineStart, lineEnd):
     planeN = vecNormalize(planeN)
     planeD = -vecDotProduct(planeN, planeP)
